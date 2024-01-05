@@ -14,7 +14,7 @@ use buttplug::{
 use futures::FutureExt;
 use tokio::{spawn, time::sleep};
 
-const CLIENT_NAME: &str = "cargo-vibe";
+const CLIENT_NAME: &str = "wally-vibe";
 
 async fn connect_to_server() -> Result<ButtplugClient, ButtplugClientError> {
     let client = ButtplugClient::new(CLIENT_NAME);
@@ -26,22 +26,18 @@ async fn connect_to_server() -> Result<ButtplugClient, ButtplugClientError> {
     Ok(client)
 }
 
-async fn start_in_process_server() -> Result<ButtplugClient, ButtplugClientError>
-{
+async fn start_in_process_server() -> Result<ButtplugClient, ButtplugClientError> {
     let client = in_process_client(CLIENT_NAME, false).await;
     client.start_scanning().await?;
     Ok(client)
 }
 
 // Parses pattern like "0.5 3s/0.75 1.5s"
-fn parse_pattern(
-    pattern: &str,
-) -> Result<Vec<(f64, Duration)>, Box<dyn std::error::Error>> {
+fn parse_pattern(pattern: &str) -> Result<Vec<(f64, Duration)>, Box<dyn std::error::Error>> {
     pattern
         .split('/')
         .map(|x| {
-            let (speed, duration) =
-                x.split_once(' ').ok_or("couldn't split")?;
+            let (speed, duration) = x.split_once(' ').ok_or("couldn't split")?;
             let speed = speed.parse()?;
             let duration = duration
                 .strip_suffix('s')
@@ -53,10 +49,8 @@ fn parse_pattern(
         .collect()
 }
 
-async fn vibrate_all(
-    client: &ButtplugClient,
-) -> Result<(), ButtplugClientError> {
-    let pattern = std::env::var("CARGO_VIBE_PATTERN")
+async fn vibrate_all(client: &ButtplugClient) -> Result<(), ButtplugClientError> {
+    let pattern = std::env::var("WALLY_VIBE_PATTERN")
         .ok()
         .as_deref()
         .and_then(|x| {
@@ -77,7 +71,7 @@ async fn vibrate_all(
         }
         client.stop_all_devices().await?;
     } else {
-        eprintln!("[cargo-vibe] no devices found");
+        eprintln!("[wally-vibe] no devices found");
     }
     Ok(())
 }
@@ -96,32 +90,32 @@ async fn real_main() -> Result<i32, Box<dyn std::error::Error>> {
     let remote_client = spawn(connect_to_server());
     let in_process_client = spawn(start_in_process_server());
 
-    let cargo_var = std::env::var_os("CARGO");
-    let cargo = cargo_var.as_deref().unwrap_or(OsStr::new("cargo"));
+    let wally_var = std::env::var_os("WALLY");
+    let wally = wally_var.as_deref().unwrap_or(OsStr::new("wally"));
     let mut arg_iter = std::env::args_os();
-    let _cargo = arg_iter.next();
-    let _cmd = arg_iter.next();
+    let _wally = arg_iter.next();
 
-    let status = std::process::Command::new(cargo).args(arg_iter).status()?;
+    let status = std::process::Command::new(wally).args(arg_iter).status()?;
     if status.success() {
-        eprintln!("[cargo-vibe] success!");
+        eprintln!("[wally-vibe] success!");
         // get remote client, or fallback to in-process one
         let client = if let Some(Ok(client)) = remote_client.now_or_never() {
-            eprintln!("[cargo-vibe] using server");
+            eprintln!("[wally-vibe] using server");
             Ok(client)
         } else {
-            eprintln!("[cargo-vibe] starting in-process server");
+            eprintln!("[wally-vibe] starting in-process server");
             in_process_client.await
         };
         if let Ok(Ok(client)) = client {
             if let Err(e) = vibrate_all(&client).await {
-                eprintln!("[cargo-vibe] error trying to vibe: {e}")
+                eprintln!("[wally-vibe] error trying to vibe: {e}")
             }
         } else {
-            eprintln!("[cargo-vibe] sorry, couldn't create a client")
+            eprintln!("[wally-vibe] sorry, couldn't create a client")
         }
     } else {
-        eprintln!("[cargo-vibe] failed");
+        eprintln!("[wally-vibe] failed");
     }
+
     Ok(status.code().unwrap_or(-1))
 }

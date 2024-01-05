@@ -297,15 +297,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfb24e866b15a1af2a1b663f10c6b6b8f397a84aadb828f12e5b289ec23a3a3c"
 
 [[package]]
-name = "cargo-vibe"
-version = "0.0.4"
-dependencies = [
- "buttplug",
- "futures",
- "tokio",
-]
-
-[[package]]
 name = "cc"
 version = "1.0.78"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2306,6 +2297,15 @@ dependencies = [
  "same-file",
  "winapi",
  "winapi-util",
+]
+
+[[package]]
+name = "wally-vibe"
+version = "0.0.4"
+dependencies = [
+ "buttplug",
+ "futures",
+ "tokio",
 ]
 
 [[package]]

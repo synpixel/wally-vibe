@@ -1,10 +1,10 @@
 [package]
-name = "cargo-vibe"
+name = "wally-vibe"
 version = "0.0.4"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/Shadlock0133/cargo-vibe"
-description = "Cargo x Buttplug.io"
+repository = "https://github.com/synpixel/wally-vibe"
+description = "Wally x Buttplug.io"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
